@@ -4,6 +4,9 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 I am using [file structure](https://www.joshwcomeau.com/react/file-structure/) that I like.
 
+I have also added `msw` and `cross-fetch`. Also configured the tests to use this.
+It would have made it easier writing tests that require mock data for API calls. I tjust did not have time to add those tests.
+
 ## Available Scripts
 
 In the project directory, you can run:
