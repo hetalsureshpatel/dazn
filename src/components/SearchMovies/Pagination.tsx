@@ -1,3 +1,5 @@
+import * as CONSTANTS from './SearchMovies.constants';
+
 interface PaginationProps {
   next: () => void;
   previous: () => void;
@@ -27,7 +29,7 @@ export default function Pagination({
             : undefined
         }
       >
-        Previous
+        {CONSTANTS.PREVIOUS}
       </button>
       <button
         type="button"
@@ -40,7 +42,7 @@ export default function Pagination({
             : undefined
         }
       >
-        Next
+        {CONSTANTS.NEXT}
       </button>
     </div>
   );
