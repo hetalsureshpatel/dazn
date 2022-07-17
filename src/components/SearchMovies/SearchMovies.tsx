@@ -1,25 +1,10 @@
-import { rejects } from 'assert';
 import { useEffect, useReducer } from 'react';
 import Criteria from './Criteria';
+import MovieTable, { Movie } from './MovieTable';
+import Spinner from '../Spinner/Spinner';
+import Pagination from './Pagination';
 
 import './search-movies.scss';
-
-interface Movie {
-  adult: boolean;
-  backdrop_path: string;
-  genre_id: Array<number>;
-  id: number;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
-}
 
 interface SearchResponse {
   page: number;
@@ -38,7 +23,9 @@ interface State {
 type Action =
   | { type: 'search'; term: string }
   | { type: 'success'; response: SearchResponse }
-  | { type: 'failure'; error: string };
+  | { type: 'failure'; error: string }
+  | { type: 'next' }
+  | { type: 'previous' };
 
 function reducer(state: State, action: Action) {
   switch (action.type) {
@@ -52,10 +39,17 @@ function reducer(state: State, action: Action) {
         page: action.response.page,
         totalPages: action.response.total_pages,
         movies: action.response.results,
+        error: '',
       };
 
     case 'failure':
       return { ...state, isLoading: false, error: action.error };
+
+    case 'next':
+      return { ...state, isLoading: true, error: '', page: state.page + 1 };
+
+    case 'previous':
+      return { ...state, isLoading: true, error: '', page: state.page - 1 };
 
     default:
       return state;
@@ -72,10 +66,8 @@ const initialState: State = {
 };
 
 export default function SearchMovies() {
-  const [{ isLoading, term, page, movies }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [{ isLoading, term, page, totalPages, movies, error }, dispatch] =
+    useReducer(reducer, initialState);
 
   // Preform search.
   useEffect(() => {
@@ -113,11 +105,28 @@ export default function SearchMovies() {
 
   return (
     <div className="search-movies">
-      <Criteria
-        search={(term) => {
-          dispatch({ type: 'search', term });
-        }}
-      />
+      <div>
+        <Criteria
+          search={(term) => {
+            dispatch({ type: 'search', term });
+          }}
+        />
+      </div>
+      <div>
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          next={() => {
+            dispatch({ type: 'next' });
+          }}
+          previous={() => {
+            dispatch({ type: 'previous' });
+          }}
+        />
+      </div>
+      <div className="table">
+        {isLoading ? <Spinner /> : <MovieTable movies={movies} error={error} />}
+      </div>
     </div>
   );
 }
